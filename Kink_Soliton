@@ -1,0 +1,13 @@
+
+m=400;
+ax = -20;
+bx = 20;
+c = 0.5; % velocity of the solitary wave
+Tfinal = 5;
+h = (bx-ax)/(m+1);
+k=(1/25)*h;
+[X,Y] = meshgrid(ax:h:bx,0:k:Tfinal);
+Z = 4*atan(exp(((X-c.*Y)/sqrt(1-(c^2)) )));
+figure
+h = surfc(X,Y,Z);
+set(h,'edgecolor','none');
