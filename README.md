@@ -1,6 +1,6 @@
 # SineGordon
 Numerical solution of the Sine Gordon Equation, the special analytical solutions are presented, 
-we solve for the "double pole soliton" solution, through the use of a hybrid schemes composed of 
+we solve for the "Kink-Kink-Collision" solution, through the use of a hybrid schemes composed of 
 Lax-Wendroff for the first time step and the [Box-Scheme, Crank-Nicolson-Scheme] for the rest of the time steps, we utilized 
 dirichlet boundary conditions, and a given initial condition. I and a partner experimented with the use of what 
 we have defined to be "Hybrid Schemes", a problem arises when using two level schemes, in that we require two time levels to 
