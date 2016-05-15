@@ -10,3 +10,5 @@ have any questions please let me know. These Hybrid Schemes are rather irratic, 
 others first, and for others it is much to irratic for pectical use. Keep this in mind if you are going to use it. In practice i recommend 
 you use some of the fourth order schemes available for use in matlab.
 
+**** NOTE, I HAVE NOT INCLUDED SOME CODE THAT THESE NUMERICAL SCHEMES ARE DEPENDENT UPON, LIKE THE ERROR LOG-LOG FUNCTION PLEASE CONTACT ME FOR THESE, I POSTED THE ABOVE FOR YOU TO HAVE A GENERAL IDEA AND TO USE AS A BASE, WHICH YOU COULD THEN MODIFY, BUT I AM HAPPY TO PROVIDE THE REST OF THE CODE ********
+
