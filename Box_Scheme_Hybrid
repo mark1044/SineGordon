@@ -1,4 +1,5 @@
-function [hVal,maxErr,normErr] = box_scheme_double_pole_soliton( m )
+function [hVal,maxErr,normErr,M] = box_Scheme_kink_kink_collision(m)
+
 
 ax = -20;
 bx = 20;
@@ -7,11 +8,10 @@ h = (bx-ax)/(m+1)
 x = linspace(ax,bx,m+2);
 t = linspace(ax,bx,m+2);
 Tfinal = 5;
-k=(1/25)*h;
+k=(1/25)*h
 Tsteps = (Tfinal / k);
-
-utrue = @(y,t)  4*atan(t.*sech(y));
-unot = @(y) y*0;
+utrue = @(y,t)  4*atan( (c.*sinh(y./sqrt( 1-(c^2) ))) ./(cosh( c.*t./(sqrt(1-(c^2))) )) );
+unot = @(y) 4*atan(c.*sinh(y./(sqrt(1-(c^2)))));
 initTwoLevel = false;
 Tgrunt = 0;
 prevApprox = [];
@@ -23,8 +23,8 @@ collectiveErrNorm = [];
 for i=1:Tsteps
 tgrunt = Tgrunt + k;
 if(~initTwoLevel)
-
 for j=2:length(x)-1
+
 if(j==2)
 uApprox(end+1) = utrue(ax,tgrunt);
 end
@@ -33,43 +33,35 @@ if(j==length(x)-1)
 uApprox(end+1) = utrue(bx,tgrunt);
 end
 end
-
-
-  %{
+%{
+    
     %CHEATING
     tCons(1:1,1:length(x)) = tgrunt;
     uApprox = utrue(x,tCons);
+    
     %}
-
 tCons(1:1,1:length(x)) = tgrunt;
 figure
 plot(x,uApprox,x,utrue(x,tCons),'r')
-pause
 max_error_init_step = maxNorm(uApprox,utrue(x,tCons))
 lTwo_error_init_step = l_two_norm( uApprox, utrue(x,tCons))
-
-
-
 prevApprox = unot(x);
 bigM(dimCount,:) =  unot(x);
 dimCount = dimCount+1;
 initTwoLevel = true;
 else
-%%% => TWO LEVEL SCHEME AFTER T0 HAS BEEN DEFINED
 if(initTwoLevel)
 
 approxGrunt = [];
 for j=2:length(x)-1
 if(j==2)
-approxGrunt(end+1) = utrue(ax,tgrunt); %using boundry condition to complete next time level, it being n = 1
+approxGrunt(end+1) = utrue(ax,tgrunt);
 end
 approxGrunt(end+1) = 2*uApprox(j) - prevApprox(j) + ((k^2)/(h^2))*(uApprox(j-1) - 2*uApprox(j) + uApprox(j+1)) - (k^2)*sin(uApprox(j));
 if(j==length(x)-1)
 approxGrunt(end+1) = utrue(bx,tgrunt);
 end
-
 end
-
 prevApprox = uApprox;
 uApprox = approxGrunt;
 end
@@ -85,11 +77,9 @@ e_max = maxNorm(uApprox,utrue(x, tCons));
 e_norm = l_two_norm(uApprox,utrue(x, tCons));
 collectiveErrMax(end + 1) = e_max;
 collectiveErrNorm(end+1) = e_norm;
-%disp('***********');
-
+% disp('***********');
 bigM(dimCount,:) = uApprox;
 dimCount = dimCount+1;
-
 Tgrunt = tgrunt;
 
 end
@@ -99,14 +89,16 @@ maxERROR_max = max(collectiveErrMax)
 maxERROR_norm = max(collectiveErrNorm)
 disp('*******');
 
-
 hVal = h;
 maxErr = maxERROR_max;
 normErr = maxERROR_norm;
 
-
 [X,Y] = meshgrid(ax:h:bx,0:k:Tfinal);
+figure
+
 mesh(X,Y, bigM);
 
+
+M = bigM;
 end
 
