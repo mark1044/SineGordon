@@ -1,16 +1,16 @@
-function [hVal,maxErr,normErr,M] = crank_Nicolson_kink_kink_collision( m )
+function [hVal, maxErr, normErr, M] = crank_Nicolson_kink_kink_collision(m)
 
-ax = -20;
+ax = - 20;
 bx = 20;
 c = 0.5; % velocity of the solitary wave
-h = (bx-ax)/(m+1)
-x = linspace(ax,bx,m+2);
-t = linspace(ax,bx,m+2);
+h = (bx - ax) / (m + 1)
+x = linspace(ax, bx, m + 2);
+t = linspace(ax, bx, m + 2);
 Tfinal = 5;
-k=(1/25)*h
+k = (1 / 25) * h
 Tsteps = (Tfinal / k);
-utrue = @(y,t)  4*atan( (c.*sinh(y./sqrt( 1-(c^2) ))) ./(cosh( c.*t./(sqrt(1-(c^2))) )) );
-unot = @(y) 4*atan(c.*sinh(y./(sqrt(1-(c^2)))));
+utrue = @(y, t) 4 * atan((c .* sinh(y ./ sqrt(1 - (c ^ 2)))) ./ (cosh(c .* t ./ (sqrt(1 - (c ^ 2))))));
+unot = @(y) 4 * atan(c .* sinh(y ./ (sqrt(1 - (c ^ 2)))));
 initTwoLevel = false;
 Tgrunt = 0;
 prevApprox = [];
@@ -19,70 +19,68 @@ bigM = [];
 dimCount = 1;
 collectiveErrMax = [];
 collectiveErrNorm = [];
-for i=1:Tsteps
-tgrunt = Tgrunt + k;
-if(~initTwoLevel)
-for j=2:length(x)-1
-if(j==2)
-uApprox(end+1) = utrue(ax,tgrunt);
-end
-uApprox(end+1) =  unot(x(j)) - (k/2*h)*( unot(x(j+1)) - unot(x(j-1)) )  + (k^2/2*h^2)*( unot(x(j+1)) - 2*unot(x(j)) + unot(x(j-1)) ) - (k^2)*sin( unot(x(j)) ); %using initial condition to gain iner points of next time level it being n = 1
-if(j==length(x)-1)
-uApprox(end+1) = utrue(bx,tgrunt);
-end
-end
-
-
-%{
-    %CHEATING
-    tCons(1:1,1:length(x)) = tgrunt;
-    uApprox = utrue(x,tCons);
-    %}
-tCons(1:1,1:length(x)) = tgrunt;
-figure
-plot(x,uApprox,x,utrue(x,tCons),'r')
-max_error_init_step = maxNorm(uApprox,utrue(x,tCons))
-lTwo_error_init_step = l_two_norm( uApprox, utrue(x,tCons))
-prevApprox = unot(x);
-bigM(dimCount,:) =  unot(x);
-dimCount = dimCount+1;
-initTwoLevel = true;
-else
-if(initTwoLevel)
-approxGrunt = [];
-r = (k^2)/(2*(h^2));
-A = full(gallery('tridiag',m+2, -r, 2*r+1, -r));
-rhs = [];
-for l=2:length(x)-1
-if(l == 2)
-rhs(end+1) = r*(utrue(ax,tgrunt) + utrue(ax,tgrunt+k)) -  prevApprox(l) + 2*(1-r)* uApprox(l) + r*uApprox(l+1) - (k^2)*sin(uApprox(l));
-end
-rhs(end+1) = r*uApprox(l-1) -  prevApprox(l) + 2*(1-r)* uApprox(l) + r*uApprox(l+1) - (k^2)*sin(uApprox(l));
-if(l == m-1)
-rhs(end+1) = r*(utrue(bx,tgrunt) + utrue(bx,tgrunt+k)) -  prevApprox(l) + 2*(1-r)* uApprox(l) + r*uApprox(l-1) - (k^2)*sin(uApprox(l));
-end
-end
-
-approxGrunt = A\rhs';
-prevApprox = uApprox;
-uApprox = approxGrunt;
-end
-end
-
-
-tCons(1:1,1:length(x)) = tgrunt;
-
-t = tgrunt;
-e_max = maxNorm(uApprox,utrue(x, tCons));
-e_norm = l_two_norm(uApprox,utrue(x, tCons));
-collectiveErrMax(end + 1) = e_max;
-collectiveErrNorm(end+1) = e_norm;
-
-bigM(dimCount,:) = uApprox';
-dimCount = dimCount+1;
-
-Tgrunt = tgrunt;
-
+for i = 1:Tsteps
+    tgrunt = Tgrunt + k;
+    if (~ initTwoLevel)
+        for j = 2:length(x) - 1
+            if (j == 2)
+                uApprox(end + 1) = utrue(ax, tgrunt);
+            end
+            uApprox(end + 1) = unot(x(j)) - (k / 2 * h) * (unot(x(j + 1)) - unot(x(j - 1))) + (k ^ 2 / 2 * h ^ 2) * (unot(x(j + 1)) - 2 * unot(x(j)) + unot(x(j - 1))) - (k ^ 2) * sin(unot(x(j))); %using initial condition to gain iner points of next time level it being n = 1
+            if (j == length(x) - 1)
+                uApprox(end + 1) = utrue(bx, tgrunt);
+            end
+        end
+     
+        %{
+        %CHEATING
+        tCons(1:1, 1:length(x)) = tgrunt;
+        uApprox = utrue(x, tCons);
+        %}
+        tCons(1:1, 1:length(x)) = tgrunt;
+        figure
+        plot(x, uApprox, x, utrue(x, tCons), 'r')
+        max_error_init_step = maxNorm(uApprox, utrue(x, tCons))
+        lTwo_error_init_step = l_two_norm(uApprox, utrue(x, tCons))
+        prevApprox = unot(x);
+        bigM(dimCount, :) = unot(x);
+        dimCount = dimCount + 1;
+        initTwoLevel = true;
+    else
+        if (initTwoLevel)
+            approxGrunt = [];
+            r = (k ^ 2) / (2 * (h ^ 2));
+            A = full(gallery('tridiag', m + 2, - r, 2 * r + 1, - r));
+            rhs = [];
+            for l = 2:length(x) - 1
+                if (l == 2)
+                    rhs(end + 1) = r * (utrue(ax, tgrunt) + utrue(ax, tgrunt + k)) - prevApprox(l) + 2 * (1 - r) * uApprox(l) + r * uApprox(l + 1) - (k ^ 2) * sin(uApprox(l));
+                end
+                rhs(end + 1) = r * uApprox(l - 1) - prevApprox(l) + 2 * (1 - r) * uApprox(l) + r * uApprox(l + 1) - (k ^ 2) * sin(uApprox(l));
+                if (l == m - 1)
+                    rhs(end + 1) = r * (utrue(bx, tgrunt) + utrue(bx, tgrunt + k)) - prevApprox(l) + 2 * (1 - r) * uApprox(l) + r * uApprox(l - 1) - (k ^ 2) * sin(uApprox(l));
+                end
+            end
+         
+            approxGrunt = A \ rhs';
+            prevApprox = uApprox;
+            uApprox = approxGrunt;
+        end
+    end
+ 
+    tCons(1:1, 1:length(x)) = tgrunt;
+ 
+    t = tgrunt;
+    e_max = maxNorm(uApprox, utrue(x, tCons));
+    e_norm = l_two_norm(uApprox, utrue(x, tCons));
+    collectiveErrMax(end + 1) = e_max;
+    collectiveErrNorm(end + 1) = e_norm;
+ 
+    bigM(dimCount, :) = uApprox';
+    dimCount = dimCount + 1;
+ 
+    Tgrunt = tgrunt;
+ 
 end
 
 disp('max error on approx: ');
@@ -94,13 +92,9 @@ hVal = h;
 maxErr = maxERROR_max;
 normErr = maxERROR_norm;
 
-
-[X,Y] = meshgrid(ax:h:bx,0:k:Tfinal);
+[X, Y] = meshgrid(ax:h:bx, 0:k:Tfinal);
 figure
-mesh(X,Y, bigM);
+mesh(X, Y, bigM);
 
 M = bigM;
 end
-
-
-
