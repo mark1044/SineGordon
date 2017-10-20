@@ -32,13 +32,7 @@ for i = 1:Tsteps
                 uApprox(end + 1) = utrue(bx, tgrunt);
             end
         end
-        %{
      
-        %CHEATING
-        tCons(1:1, 1:length(x)) = tgrunt;
-        uApprox = utrue(x, tCons);
-     
-        %}
         tCons(1:1, 1:length(x)) = tgrunt;
         figure
         plot(x, uApprox, x, utrue(x, tCons), 'r')
